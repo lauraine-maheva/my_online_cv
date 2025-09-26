@@ -255,38 +255,108 @@
 
 })();
 
-function sendEMail(params){
-  var tempParams = {
-    from_name: document.getElementById("name").value,
-    to_name: document.getElementById("email").value,
-    message: document.getElementById("message").value,
+function sendEMail() {
+  // Récupération sûre + trim (et valeurs par défaut)
+  const nameEl = document.getElementById("name");
+  const emailEl = document.getElementById("email");
+  const messageEl = document.getElementById("message");
+  const subjectEl = document.getElementById("subject"); // peut ne pas exister
+  const phoneEl = document.getElementById("phone");     // peut ne pas exister
 
+  const tempParams = {
+    from_name: (nameEl?.value || "").trim(),
+    to_mail: (emailEl?.value || "").trim(),
+    subject: (subjectEl?.value || "").trim(),
+    phone: (phoneEl?.value || "").trim(),
+    message: (messageEl?.value || "").trim(),
   };
-  if(tempParams.from_name =='' || tempParams.to_mail =='' || tempParams.message =='') {
+
+  // Vérif présence des éléments critiques (au cas où les IDs changent)
+  if (!nameEl || !emailEl || !messageEl) {
     swal({
-      title: "Fields Empty",
-      text: "Please check the missing field",
+      title: "Formularfehler",
+      text: "Pflichtfelder konnten nicht gefunden werden. Bitte aktualisieren Sie die Seite oder kontaktieren Sie den Administrator.",
+      icon: "error",
+      button: "OK"
+    });
+    return;
+  }
+
+  // Champs obligatoires
+  if (!tempParams.from_name || !tempParams.to_mail || !tempParams.message) {
+    swal({
+      title: "Felder leer",
+      text: "Bitte überprüfen Sie die Pflichtfelder (Name, E-Mail, Nachricht).",
       icon: "warning",
       button: "OK"
     });
+    return;
   }
 
-  if(tempParams.from_name !='' && tempParams.to_mail !='' && tempParams.message !=''){
-    emailjs.send('service_rjs7ovp','template_891r5pe',tempParams).then(function (res){
-      console.log("succes",res.status);
-    })
-
+  // Validation e-mail
+  const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(tempParams.to_mail);
+  if (!isEmail) {
     swal({
-      title: "Your messsage has been sent. Thank you!",
-      icon: "success"
+      title: "Ungültige E-Mail",
+      text: "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+      icon: "warning",
+      button: "OK"
     });
-    document.getElementById("name").value ='';
-    document.getElementById("email").value ='';
-    document.getElementById("message").value = '';
+    return;
   }
 
+  // Payload attendu par l'API (toutes clés en string)
+  const payload = {
+    name: tempParams.from_name,
+    email: tempParams.to_mail,
+    subject: tempParams.subject || "",
+    phone: tempParams.phone || "",
+    message: tempParams.message
+  };
 
+  const submitBtn = document.querySelector('#contact-submit');
+  submitBtn?.setAttribute('disabled', 'disabled');
 
+  fetch('https://api.geekinstitut.com?enterprise=LAURAINE_MAHEVA', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(async (res) => {
+    let data = null;
+    try { data = await res.json(); } catch (e) { /* réponse vide/non JSON : OK */ }
+    if (!res.ok) {
+      const msg = (data && (data.error || data.message)) || `HTTP ${res.status}`;
+      throw new Error(msg);
+    }
+    return data;
+  })
+  .then(() => {
+    swal({
+      title: "Ihre Nachricht wurde gesendet.",
+      text: "Vielen Dank für Ihre Kontaktaufnahme!",
+      icon: "success",
+      button: "OK"
+    });
+    // Reset uniquement les champs existants
+    nameEl.value = '';
+    emailEl.value = '';
+    messageEl.value = '';
+    if (subjectEl) subjectEl.value = '';
+    if (phoneEl) phoneEl.value = '';
+  })
+  .catch((err) => {
+    console.error('Kontaktformular Fehler:', err);
+    swal({
+      title: "Hoppla! Etwas ist schiefgelaufen",
+      text: err.message || "Ihre Nachricht konnte momentan nicht gesendet werden.",
+      icon: "error",
+      button: "OK"
+    });
+  })
+  .finally(() => {
+    submitBtn?.removeAttribute('disabled');
+  });
 }
 
 
