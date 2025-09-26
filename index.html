@@ -748,26 +748,28 @@
           </div>
 
           <div class="col-lg-7 mt-5 mt-lg-0 d-flex align-items-stretch">
-            <form  class="php-email-form">
+            <form class="php-email-form">
               <div class="row">
                 <div class="form-group col-md-6">
-                  <label for="name">Your Name <span>*</span></label>
-                  <input type="text" name="name" class="form-control" id="name" >
+                  <label for="name">Ihr Name <span>*</span></label>
+                  <input type="text" name="name" class="form-control" id="name">
                 </div>
                 <div class="form-group col-md-6">
-                  <label for="name">Your Email  <span>*</span></label>
-                  <input type="email" class="form-control" name="email" id="email" >
+                  <label for="email">Ihre E-Mail <span>*</span></label>
+                  <input type="email" class="form-control" name="email" id="email">
                 </div>
               </div>
               <div class="form-group">
-                <label for="name">Message <span>*</span></label>
-                <textarea class="form-control" id="message" name="message" rows="10" ></textarea>
+                <label for="message">Nachricht <span>*</span></label>
+                <textarea class="form-control" id="message" name="message" rows="10"></textarea>
               </div>
               <div class="my-3">
-                <div class="loading">Loading</div>
-                <div class="sent-message">Your message has been sent. Thank you!</div>
+                <div class="loading">Wird gesendet...</div>
+                <div class="sent-message">Ihre Nachricht wurde gesendet. Vielen Dank!</div>
               </div>
-              <div class="text-center"><button type="submit" onclick="sendEMail()">Send Message</button></div>
+              <div class="text-center">
+                <button type="submit" id="contact-submit" onclick="sendEMail()">Nachricht senden</button>
+              </div>
             </form>
           </div>
 

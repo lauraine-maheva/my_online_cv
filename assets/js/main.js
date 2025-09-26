@@ -317,7 +317,7 @@ function sendEMail() {
   const submitBtn = document.querySelector('#contact-submit');
   submitBtn?.setAttribute('disabled', 'disabled');
 
-  fetch('https://api.geekinstitut.com?enterprise=LAURAINE_MAHEVA', {
+  fetch('https://api.geekinstitut.com/api/contacts?enterprise=LAURAINE_MAHEVA', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     body: JSON.stringify(payload)
